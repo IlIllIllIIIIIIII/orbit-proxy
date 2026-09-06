@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0b1020" />
     <title>Orbit Proxy</title>
+    <script src="/js/tab-spinner.js" defer></script>
     <link rel="stylesheet" href="/styles.css" />
     <script
       async
@@ -60,6 +61,10 @@
           />
           <button type="submit">Open site</button>
         </form>
+        <nav class="shortcuts" aria-label="Website shortcuts">
+          <button type="button" data-proxy-url="https://youtube.com" disabled>YouTube</button>
+          <button type="button" data-proxy-url="https://play.geforcenow.com/mall/" disabled>GeForce NOW</button>
+        </nav>
         <p class="hint">Use only sites and services you are authorized to access.</p>
       </section>
 
