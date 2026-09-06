@@ -1,0 +1,64 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #080b16;
+  color: #f4f6ff;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; min-width: 320px; min-height: 100vh; background: #080b16; }
+
+.shell { min-height: 100vh; display: flex; flex-direction: column; }
+
+.toolbar {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #273152;
+  background: rgba(10, 15, 31, 0.94);
+}
+
+.brand { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-weight: 750; letter-spacing: -0.02em; text-decoration: none; }
+.brand-mark { color: #70e4d2; font-size: 1.4rem; }
+.controls { display: flex; gap: 5px; }
+
+button { border: 0; border-radius: 9px; color: #07131a; background: #70e4d2; font: inherit; font-weight: 700; cursor: pointer; }
+button:hover:not(:disabled) { background: #a2f0e4; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+.icon-button { width: 32px; height: 32px; color: #dce6ff; background: #1d2745; font-size: 1.15rem; }
+.icon-button:hover:not(:disabled) { color: #07131a; background: #c6d2ff; }
+
+.address-form { flex: 1; min-width: 0; display: flex; gap: 8px; }
+input { min-width: 0; width: 100%; border: 1px solid #344266; border-radius: 9px; padding: 9px 12px; color: #f8fbff; background: #111a31; font: inherit; outline: none; }
+input:focus { border-color: #70e4d2; box-shadow: 0 0 0 3px rgba(112, 228, 210, 0.15); }
+.address-form button { padding: 0 16px; }
+.status { width: 100px; color: #aeb9d8; font-size: 0.82rem; text-align: right; }
+
+.welcome { position: relative; flex: 1; display: grid; place-content: center; overflow: hidden; padding: 52px 20px; text-align: center; background: radial-gradient(circle at 50% 40%, #172a55 0%, #0c1429 28%, #080b16 65%); }
+.welcome > :not(.orb) { position: relative; z-index: 1; }
+.orb { position: absolute; width: min(55vw, 600px); aspect-ratio: 1; border: 1px solid rgba(112, 228, 210, 0.3); border-radius: 50%; box-shadow: 0 0 150px 45px rgba(78, 110, 255, 0.16), inset 0 0 100px rgba(112, 228, 210, 0.08); }
+.eyebrow { margin: 0 0 16px; color: #70e4d2; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.18em; }
+h1 { max-width: 730px; margin: 0; font-size: clamp(2.35rem, 7vw, 5.2rem); line-height: 0.98; letter-spacing: -0.07em; }
+.welcome-copy { max-width: 545px; margin: 24px auto; color: #c1cbe4; font-size: 1.04rem; line-height: 1.6; }
+.welcome-form { display: flex; width: min(100%, 620px); gap: 9px; margin: 30px auto 0; padding: 7px; border: 1px solid #344266; border-radius: 14px; background: rgba(12, 20, 41, 0.86); }
+.welcome-form input { border: 0; background: transparent; }
+.welcome-form button { flex: none; padding: 11px 18px; }
+.hint { margin-top: 18px; color: #8391b5; font-size: 0.78rem; }
+
+.proxy-view { flex: 1; background: #fff; }
+#proxy-frame { display: block; width: 100%; height: calc(100vh - 65px); border: 0; background: #fff; }
+#proxy-frame:fullscreen { width: 100vw; height: 100vh; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+@media (max-width: 720px) {
+  .toolbar { gap: 8px; padding: 10px; flex-wrap: wrap; }
+  .brand { min-width: max-content; }
+  .status { display: none; }
+  .address-form { order: 2; flex-basis: 100%; }
+  #proxy-frame { height: calc(100vh - 112px); }
+  .welcome-form { flex-direction: column; }
+  .welcome-form button { width: 100%; }
+}

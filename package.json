@@ -1,0 +1,25 @@
+{
+  "name": "scramjet-v2-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A small self-hosted Scramjet V2 web proxy.",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "wisp": "node wisp-server.js",
+    "wisp:dev": "node --watch wisp-server.js",
+    "check": "node --check server.js && node --check wisp-server.js && node --check public/js/app.js && node --check public/js/engine.js && node --check public/sw.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@mercuryworkshop/libcurl-transport": "^2.0.5",
+    "@mercuryworkshop/scramjet": "2.0.67-alpha.2",
+    "@mercuryworkshop/scramjet-controller": "0.0.14",
+    "@mercuryworkshop/scramjet-utils": "0.0.3",
+    "@mercuryworkshop/wisp-js": "^0.4.1",
+    "express": "^5.1.0"
+  }
+}

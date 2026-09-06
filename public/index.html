@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1020" />
+    <title>Orbit Proxy</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="toolbar">
+        <a class="brand" href="/" aria-label="Orbit Proxy home">
+          <span class="brand-mark" aria-hidden="true">◉</span>
+          <span>Orbit</span>
+        </a>
+        <nav class="controls" aria-label="Proxy navigation">
+          <button id="back" class="icon-button" type="button" title="Back" disabled>←</button>
+          <button id="forward" class="icon-button" type="button" title="Forward" disabled>→</button>
+          <button id="reload" class="icon-button" type="button" title="Reload" disabled>↻</button>
+          <button id="fullscreen" class="icon-button" type="button" title="Enter fullscreen" disabled>⛶</button>
+        </nav>
+        <form id="address-form" class="address-form">
+          <label class="sr-only" for="address">Website address or search</label>
+          <input
+            id="address"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="Search or enter a website"
+            inputmode="url"
+          />
+          <button type="submit">Go</button>
+        </form>
+        <span id="status" class="status" aria-live="polite">Starting…</span>
+      </header>
+
+      <section id="welcome" class="welcome" aria-labelledby="welcome-title">
+        <div class="orb" aria-hidden="true"></div>
+        <p class="eyebrow">SCRAMJET V2</p>
+        <h1 id="welcome-title">Browse through your own relay.</h1>
+        <p class="welcome-copy">
+          Enter a full web address or a search term. This proxy runs locally and
+          keeps its session inside this browser.
+        </p>
+        <form id="welcome-form" class="welcome-form">
+          <label class="sr-only" for="welcome-address">Website address or search</label>
+          <input
+            id="welcome-address"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="https://example.com"
+            inputmode="url"
+          />
+          <button type="submit">Open site</button>
+        </form>
+        <p class="hint">Use only sites and services you are authorized to access.</p>
+      </section>
+
+      <section id="proxy-view" class="proxy-view" hidden aria-label="Proxied website">
+        <iframe id="proxy-frame" title="Proxied website" referrerpolicy="no-referrer" allowfullscreen></iframe>
+      </section>
+    </main>
+
+    <script src="/scram/scramjet.js"></script>
+    <script src="/controller/controller.api.js"></script>
+    <script src="/utils/scramjet-utils.js"></script>
+    <script src="/libcurl/index.js"></script>
+    <script src="/config.js"></script>
+    <script src="/js/engine.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>
