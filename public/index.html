@@ -19,7 +19,15 @@
       <button id="blank-open" type="button">Open in about:blank</button>
     </aside>
     <main class="shell">
+      <aside class="sidebar" id="sidebar" aria-label="Browser tabs">
+        <div class="sidebar-heading"><span class="brand-mark">◉</span><strong>Orbit</strong><span class="sidebar-caption">Personal</span></div>
+        <button id="new-tab" class="new-tab" type="button">＋ New tab</button>
+        <p class="sidebar-label">OPEN TABS</p>
+        <nav id="tab-list" aria-label="Open tabs"></nav>
+        <div class="sidebar-footer"><span class="workspace-dot"></span> Your workspace <span>◌</span></div>
+      </aside>
       <header class="toolbar">
+        <button id="sidebar-toggle" class="icon-button" type="button" aria-label="Toggle sidebar" aria-controls="sidebar" aria-expanded="true">☰</button>
         <a class="brand" href="/" aria-label="Orbit Proxy home">
           <span class="brand-mark" aria-hidden="true">◉</span>
           <span>Orbit</span>
@@ -46,12 +54,10 @@
       </header>
 
       <section id="welcome" class="welcome" aria-labelledby="welcome-title">
-        <div class="orb" aria-hidden="true"></div>
-        <p class="eyebrow">ORBIT • GALAXY V7 ENGINES</p>
-        <h1 id="welcome-title">Browse through your own relay.</h1>
+        <p class="eyebrow">YOUR SPACE ON THE WEB</p>
+        <h1 id="welcome-title">Where to next?</h1>
         <p class="welcome-copy">
-          Enter a full web address or a search term. This proxy runs locally and
-          keeps its session inside this browser.
+          Search something new. Pick up where you left off.
         </p>
         <form id="welcome-form" class="welcome-form">
           <label class="sr-only" for="welcome-address">Website address or search</label>

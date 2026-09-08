@@ -1,12 +1,39 @@
 (function () {
   'use strict';
-  const iframe = document.getElementById('proxy-frame');
+  let iframe = document.getElementById('proxy-frame');
   const engineSelect = document.getElementById('proxy-engine');
   const transportSelect = document.getElementById('proxy-transport');
   const emit = (name, detail) => window.dispatchEvent(new CustomEvent(name, { detail }));
   const wisp = window.__PROXY_CONFIG__?.wispUrl || new URL('/wisp/', location.href).href.replace(/^http/, 'ws');
   let ready = false, controller, prismFrame, legacy, connection, registration;
   let activeEngine = 'prism', currentTransport, pending = false;
+  const tabs = new Map();
+  let activeTab = 'initial';
+  window.proxySelectTab = id => {
+    if (pending) throw new Error('Please wait for the current navigation.');
+    tabs.set(activeTab, { iframe, prismFrame, activeEngine });
+    iframe.hidden = true;
+    if (!tabs.has(id)) {
+      const element = document.createElement('iframe');
+      element.className = 'proxy-frame';
+      element.title = 'Proxied website';
+      element.allowFullscreen = true;
+      element.referrerPolicy = 'no-referrer';
+      document.getElementById('proxy-view').appendChild(element);
+      tabs.set(id, { iframe: element, prismFrame: null, activeEngine: 'prism' });
+      listenForLoad(element);
+    }
+    ({ iframe, prismFrame, activeEngine } = tabs.get(id));
+    activeTab = id;
+    iframe.hidden = false;
+  };
+  window.proxyCloseTab = id => {
+    const tab = tabs.get(id);
+    if (tab && id !== activeTab) {
+      tab.iframe.remove();
+      tabs.delete(id);
+    }
+  };
   async function timeout(promise, ms, message) {
     let timer;
     try {
@@ -61,15 +88,18 @@
           Object.assign($scramjetController.config.codec, window.orbitCodec);
           controller = new $scramjetController.Controller({ serviceworker: registration.active, transport });
           await controller.wait();
+        } else await controller.setTransport(transport);
+        currentTransport = choice;
+      }
+      if (!prismFrame) {
+          const owner = iframe;
           prismFrame = controller.createFrame(iframe, { plugins: [
-            new $scramjetUtils.UrlWatcherPlugin(url => emit('proxy:url', url)),
+            new $scramjetUtils.UrlWatcherPlugin(url => { if (iframe === owner) emit('proxy:url', url); }),
             new $scramjetUtils.CatchEscapedLinksPlugin(url => {
-              window.proxyNavigate(url.toString()).catch(error => emit('proxy:status', error.message));
+              if (iframe === owner) window.proxyNavigate(url.toString()).catch(error => emit('proxy:status', error.message));
               return new URL(location.href);
             })
           ] });
-        } else await controller.setTransport(transport);
-        currentTransport = choice;
       }
     } else {
       const base = selected === 'epoxy' ? '/libbybutslightlyworse/index.mjs' : '/libby/index.mjs';
@@ -93,7 +123,9 @@
     } finally { pending = false; }
   };
 
-  iframe.addEventListener('load', () => {
+  function listenForLoad(element) {
+  element.addEventListener('load', () => {
+    if (element !== iframe) return;
     if (!ready) return;
     try {
       const href = iframe.contentWindow.location.href;
@@ -102,6 +134,8 @@
     } catch (_) { /* Cross-origin documents do not expose their URL. */ }
     emit('proxy:status', 'Ready');
   });
+  }
+  listenForLoad(iframe);
   const control = (method) => {
     try {
       if (activeEngine === 'prism') prismFrame?.[method]();

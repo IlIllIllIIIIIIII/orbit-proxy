@@ -7,6 +7,7 @@ test('Galaxy integration selects all three engines and both transport APIs', asy
   const calls = [];
   const elements = {
     'proxy-frame': { addEventListener() {}, contentWindow: { location: {}, history: {} } },
+    'proxy-view': { appendChild() {} },
     'proxy-engine': { value: 'prism' },
     'proxy-transport': { value: 'libcurlRaw' }
   };
@@ -20,7 +21,10 @@ test('Galaxy integration selects all three engines and both transport APIs', asy
     atob: value => Buffer.from(value, 'base64').toString('binary'),
     location: { protocol: 'https:', href: 'https://orbit.test/' },
     navigator: { serviceWorker: { controller: {}, ready: Promise.resolve(), register: async () => ({ active: {} }) } },
-    document: { getElementById: id => elements[id] },
+    document: {
+      getElementById: id => elements[id],
+      createElement: () => ({ addEventListener() {}, remove() { this.removed = true; }, contentWindow: { location: {}, history: {} } })
+    },
     CustomEvent: class { constructor(type, options) { this.type = type; this.detail = options.detail; } },
     dispatchEvent(event) { if (event.type === 'proxy:ready') finish(); if (event.type === 'proxy:error') throw Error(event.detail); },
     $scramjetLoadController: () => ({ ScramjetController: class {
@@ -55,6 +59,13 @@ test('Galaxy integration selects all three engines and both transport APIs', asy
   const url = 'https://example.com/';
   await context.proxyNavigate(url);
   assert.deepEqual(calls.find(call => call[0] === 'go'), ['go', url]);
+  const beforeSwitch = calls.length;
+  context.proxySelectTab('second');
+  assert.equal(elements['proxy-frame'].hidden, true);
+  context.proxySelectTab('initial');
+  assert.equal(elements['proxy-frame'].hidden, false);
+  assert.equal(calls.length, beforeSwitch, 'Switching tabs must not navigate or reload');
+  context.proxyCloseTab('second');
   elements['proxy-engine'].value = 'polygon';
   await context.proxyNavigate(url);
   assert.equal(elements['proxy-frame'].src, '/scramjet/' + encodeURIComponent(url));

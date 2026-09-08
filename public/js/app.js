@@ -16,6 +16,63 @@
     button.addEventListener("click", () => navigate(button.dataset.proxyUrl));
   });
   let ready = false;
+  const tabs = [{ id: 'initial', url: '' }];
+  let activeTab = tabs[0];
+  const list = document.getElementById('tab-list');
+  function renderTabs() {
+    list.replaceChildren();
+    for (const tab of tabs) {
+      const row = document.createElement('div');
+      row.className = 'tab-row' + (tab === activeTab ? ' active' : '');
+      const open = document.createElement('button');
+      open.className = 'tab-open';
+      const title = tab.url ? new URL(tab.url).hostname : 'New tab';
+      open.textContent = '◌  ' + title;
+      open.title = tab.url || title;
+      open.setAttribute('aria-current', tab === activeTab ? 'page' : 'false');
+      open.onclick = () => selectTab(tab);
+      const close = document.createElement('button');
+      close.className = 'tab-close';
+      close.textContent = '×';
+      close.setAttribute('aria-label', 'Close ' + title);
+      close.onclick = () => {
+        if (tab === activeTab) {
+          const next = tabs.find(item => item !== tab);
+          if (next ? !selectTab(next) : !newTab()) return;
+        }
+        window.proxyCloseTab(tab.id);
+        tabs.splice(tabs.indexOf(tab), 1);
+        renderTabs();
+      };
+      row.append(open, close);
+      list.appendChild(row);
+    }
+  }
+  function selectTab(tab) {
+    try { window.proxySelectTab(tab.id); }
+    catch (error) { status.textContent = error.message; return false; }
+    activeTab = tab;
+    address.value = tab.url;
+    welcomeAddress.value = tab.url;
+    welcome.hidden = Boolean(tab.url);
+    proxyView.hidden = !tab.url;
+    renderTabs();
+    return true;
+  }
+  function newTab() {
+    const tab = { id: crypto.randomUUID(), url: '' };
+    if (!selectTab(tab)) return false;
+    tabs.push(tab);
+    renderTabs();
+    welcomeAddress.focus();
+    return true;
+  }
+  document.getElementById('new-tab').onclick = newTab;
+  document.getElementById('sidebar-toggle').onclick = event => {
+    const collapsed = document.querySelector('.shell').classList.toggle('sidebar-collapsed');
+    event.currentTarget.setAttribute('aria-expanded', String(!collapsed));
+  };
+  renderTabs();
   document.querySelector('.brand').addEventListener('click', event => {
     event.preventDefault();
     welcome.hidden = false;
@@ -39,6 +96,8 @@
       const url = normalize(value);
       await window.proxyNavigate(url);
       address.value = url;
+      activeTab.url = url;
+      renderTabs();
       welcomeAddress.value = url;
       welcome.hidden = true;
       proxyView.hidden = false;
@@ -87,6 +146,8 @@
     const url = event.detail;
     if (typeof url === "string" && /^https?:\/\//.test(url)) {
       address.value = url;
+      activeTab.url = url;
+      renderTabs();
     }
     if (ready) status.textContent = "Ready";
   });

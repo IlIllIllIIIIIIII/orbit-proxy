@@ -64,12 +64,58 @@ h1 { max-width: 730px; margin: 0; font-size: clamp(2.35rem, 7vw, 5.2rem); line-h
 #proxy-frame:fullscreen { width: 100vw; height: 100vh; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
+/* Zen-inspired browser chrome; the proxy remains Orbit. */
+:root { background: #202635; }
+body { background: #202635; }
+.shell { height: 100dvh; min-height: 580px; display: grid; grid-template-columns: 228px minmax(0, 1fr); grid-template-rows: 60px minmax(0, 1fr); padding: 8px; gap: 0 8px; background: linear-gradient(145deg, #303951, #202635 65%); }
+.sidebar { grid-row: 1 / -1; display: flex; flex-direction: column; min-height: 0; padding: 16px 8px 8px; }
+.sidebar-heading { display: flex; align-items: center; gap: 10px; padding: 0 8px 26px; }
+.sidebar-caption { margin-left: auto; font-size: .875rem; color: #b6c0d5; }
+.sidebar-label { padding: 14px 10px 4px; color: #aebbd3; font-size: .75rem; letter-spacing: .12em; }
+.new-tab { text-align: left; padding: 12px; background: #ffffff0d; color: #e4eaf5; font-size: .9rem; font-weight: 500; }
+#tab-list { overflow-y: auto; flex: 1; }
+.tab-row { display: flex; align-items: center; border-radius: 10px; margin: 5px 0; padding: 3px; }
+.tab-row.active { background: #ffffff18; box-shadow: inset 0 0 0 1px #ffffff0c; }
+.tab-open { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; text-align: left; padding: 11px 8px; font-size: .9rem; font-weight: 500; }
+.tab-open, .tab-close { background: transparent; color: #e2e7f2; }
+.tab-close { width: 30px; height: 32px; font-size: 1.1rem; }
+.sidebar-footer { display: flex; align-items: center; gap: 9px; padding: 18px 8px 4px; color: #bbc5d9; font-size: .875rem; }
+.sidebar-footer > :last-child { margin-left: auto; }
+.workspace-dot { width: 8px; height: 8px; background: #9db7f3; border-radius: 50%; }
+.toolbar { grid-column: 2; min-height: 0; padding: 6px 4px 12px; background: transparent; border: 0; gap: 8px; }
+.toolbar .brand { display: none; }
+.icon-button { background: transparent; }
+.address-form { border-radius: 10px; background: #ffffff0a; }
+.address-form input { border: 0; background: transparent; font-size: .9rem; }
+.address-form button { background: transparent; color: #c5d4f5; }
+.status { font-size: .875rem; width: 110px; overflow-wrap: anywhere; }
+.welcome, .proxy-view { grid-column: 2; grid-row: 2; border-radius: 14px; overflow: hidden; min-height: 0; box-shadow: 0 6px 24px #0003; }
+.welcome { background: radial-gradient(ellipse at 75% 95%, #35465d, transparent 65%), #151c29; overflow-y: auto; padding: 32px 24px; }
+h1 { font-size: clamp(2rem, 4vw, 3.4rem); font-weight: 550; letter-spacing: -.05em; }
+.eyebrow { color: #a9bcdc; letter-spacing: .16em; font-size: .75rem; }
+.welcome-copy { font-size: 1rem; color: #a9b5ca; margin: 18px auto 6px; }
+.welcome-form { margin-top: 26px; border-color: #ffffff18; background: #ffffff06; }
+.welcome-form button { background: #b5c9ed; }
+.hint { font-size: .875rem; }
+.proxy-options select { background: #202a3a; }
+.proxy-frame, #proxy-frame { height: 100%; width: 100%; border: 0; background: white; display: block; }
+.proxy-frame:fullscreen { width: 100vw; height: 100vh; }
+.shell.sidebar-collapsed { grid-template-columns: 0 minmax(0, 1fr); gap: 0; }
+.sidebar-collapsed .sidebar { display: none; }
+button:focus-visible { outline: 2px solid #bed3ff; outline-offset: 2px; }
+@media (max-width: 720px) {
+  .shell { grid-template-columns: 150px minmax(0, 1fr); grid-template-rows: 100px minmax(0, 1fr); }
+  .sidebar-caption { display: none; }
+  .welcome { padding: 24px 12px; }
+  .proxy-options { flex-direction: column; }
+}
+
 @media (max-width: 720px) {
   .toolbar { gap: 8px; padding: 10px; flex-wrap: wrap; }
   .brand { min-width: max-content; }
   .status { display: none; }
   .address-form { order: 2; flex-basis: 100%; }
-  #proxy-frame { height: calc(100vh - 112px); }
+  #proxy-frame { height: 100%; }
   .welcome-form { flex-direction: column; }
   .welcome-form button { width: 100%; }
 }
