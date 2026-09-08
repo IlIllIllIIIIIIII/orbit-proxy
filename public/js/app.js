@@ -29,10 +29,10 @@
     return `https://www.google.com/search?q=${encodeURIComponent(value)}`;
   }
 
-  function navigate(value) {
+  async function navigate(value) {
     try {
       const url = normalize(value);
-      window.proxyNavigate(url);
+      await window.proxyNavigate(url);
       address.value = url;
       welcomeAddress.value = url;
       welcome.hidden = true;

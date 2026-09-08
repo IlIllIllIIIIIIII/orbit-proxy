@@ -16,6 +16,9 @@
     "node": ">=20"
   },
   "dependencies": {
+    "chemicaljs": "file:vendor/chemicaljs",
+    "@mercuryworkshop/bare-mux": "2.1.9",
+    "chemical-libcurl": "npm:@mercuryworkshop/libcurl-transport@1.5.2",
     "@mercuryworkshop/libcurl-transport": "^2.0.5",
     "@mercuryworkshop/scramjet": "2.0.67-alpha.2",
     "@mercuryworkshop/scramjet-controller": "0.0.14",

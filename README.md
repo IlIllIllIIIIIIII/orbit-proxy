@@ -1,6 +1,10 @@
-# Orbit — Scramjet V2 proxy
+# Orbit — ChemicalJS proxy
 
-A compact self-hosted web proxy built on the Scramjet 2.x controller stack, libcurl transport, and a local Wisp endpoint.
+A compact self-hosted web proxy using ChemicalJS 2.6.4 with its Ultraviolet engine, compatible libcurl transport, and a Wisp endpoint. Website addresses are encoded by ChemicalJS and opened inside the existing iframe, with shortcuts and fullscreen controls preserved.
+
+ChemicalJS browser assets are vendored because its published package references unavailable server dependencies. Include the entire `vendor/chemicaljs` folder when uploading to GitHub. See `vendor/chemicaljs/PROVENANCE.md` and its upstream AGPL license. The build also distributes these sources at `/chemical-source/`.
+
+After deploying this engine change, close and reopen the site to initialize the new runtime. This does not guarantee that a network filter will allow GeForce NOW or that game streaming will work.
 
 ## Run it
 

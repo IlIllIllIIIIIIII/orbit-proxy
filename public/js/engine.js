@@ -1,97 +1,66 @@
 (function () {
   "use strict";
-
-  let controller;
-  let frame;
-
-  const wispUrl =
-    window.__PROXY_CONFIG__?.wispUrl ||
-    new URL("/wisp/", location.href).toString().replace(/^http/, "ws");
-
-  function emit(name, detail) {
-    window.dispatchEvent(new CustomEvent(name, { detail }));
-  }
-
-  async function getActiveWorker(registration) {
-    if (navigator.serviceWorker.controller) {
-      return navigator.serviceWorker.controller;
-    }
-
-    await navigator.serviceWorker.ready;
-    return navigator.serviceWorker.controller || registration.active;
-  }
+  const frame = document.getElementById("proxy-frame");
+  let ready = false;
+  const emit = (name, detail) => window.dispatchEvent(new CustomEvent(name, { detail }));
 
   async function initialize() {
-    if (!("serviceWorker" in navigator)) {
-      throw new Error("This browser does not support service workers.");
+    if (location.protocol === "file:" || !navigator.serviceWorker) {
+      throw new Error("Open Orbit through localhost or your HTTPS website, not a local file.");
     }
-
-    emit("proxy:status", "Installing service worker…");
-    const registration = await navigator.serviceWorker.register("/sw.js", {
-      scope: "/"
+    emit("proxy:status", "Starting ChemicalJS…");
+    await new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      const finish = (error) => {
+        clearTimeout(timer);
+        window.removeEventListener("chemicalLoaded", loaded);
+        window.removeEventListener("chemicalError", failed);
+        error ? reject(error) : resolve();
+      };
+      const loaded = () => finish();
+      const failed = (event) => finish(new Error(event.detail || "ChemicalJS failed to start."));
+      const timer = setTimeout(() => finish(new Error("ChemicalJS startup timed out. Check your connection.")), 30000);
+      window.addEventListener("chemicalLoaded", loaded);
+      window.addEventListener("chemicalError", failed);
+      script.src = "/chemical.js";
+      script.dataset.transport = "libcurl";
+      script.dataset.wisp = window.__PROXY_CONFIG__?.wispUrl || new URL("/wisp/", location.href).href.replace(/^http/, "ws");
+      script.onerror = () => finish(new Error("Unable to load ChemicalJS."));
+      document.head.appendChild(script);
     });
-    const serviceworker = await getActiveWorker(registration);
-
-    if (!serviceworker) {
-      throw new Error("The service worker did not become active. Reload once and try again.");
+    const registration = await navigator.serviceWorker.getRegistration("/");
+    const deadline = Date.now() + 20000;
+    while (!registration?.active || registration.installing || registration.waiting || !navigator.serviceWorker.controller) {
+      if (Date.now() > deadline) throw new Error("Proxy service worker did not activate. Close and reopen this site.");
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
-
-    emit("proxy:status", "Connecting proxy…");
-    controller = new $scramjetController.Controller({
-      serviceworker,
-      transport: new LibcurlTransport.LibcurlClient({ wisp: wispUrl }),
-      config: {
-        scramjetPath: "/scram/scramjet.js",
-        wasmPath: "/scram/scramjet.wasm",
-        injectPath: "/controller/controller.inject.js"
-      }
-    });
-
-    await controller.wait();
-
-    const iframe = document.getElementById("proxy-frame");
-    frame = controller.createFrame(iframe, {
-      plugins: [
-        new $scramjetUtils.HttpCachePlugin(),
-        new $scramjetUtils.UrlWatcherPlugin((url) => emit("proxy:url", url)),
-        new $scramjetUtils.CatchEscapedLinksPlugin((url) => {
-          window.proxyNavigate(url.toString());
-          return new URL(location.href);
-        })
-      ]
-    });
-
+    ready = true;
     emit("proxy:ready");
     emit("proxy:status", "Ready");
   }
 
-  window.proxyNavigate = function proxyNavigate(url) {
-    if (!frame) {
-      throw new Error("The proxy is still starting. Please wait a moment.");
-    }
-
-    frame.go(url);
+  window.proxyNavigate = async (url) => {
+    if (!ready) throw new Error("The proxy is still starting. Please wait a moment.");
+    const encoded = await window.chemical.encode(url, { service: "uv", autoHttps: true });
+    if (!encoded) throw new Error("Unable to encode this address.");
+    frame.src = encoded;
     emit("proxy:url", url);
     emit("proxy:status", "Loading…");
   };
-
-  window.proxyBack = () => frame?.back();
-  window.proxyForward = () => frame?.forward();
-  window.proxyReload = () => frame?.reload();
-  window.proxyToggleFullscreen = async function proxyToggleFullscreen() {
-    const iframe = document.getElementById("proxy-frame");
-    if (!iframe) throw new Error("No proxied page is open.");
-
-    if (document.fullscreenElement) {
-      await document.exitFullscreen();
-      return;
-    }
-
-    await iframe.requestFullscreen();
-  };
-
-  initialize().catch((error) => {
-    console.error(error);
-    emit("proxy:error", error.message || "Unable to start the proxy.");
+  frame.addEventListener("load", async () => {
+    if (!ready) return;
+    try {
+      const url = frame.contentWindow.location.href;
+      if (url.includes("/~/uv/")) emit("proxy:url", await window.chemical.decode(url, { service: "uv" }));
+      emit("proxy:status", "Ready");
+    } catch (_) { /* A cross-origin frame does not expose its address. */ }
   });
+  const control = (action) => {
+    try { action(); } catch (error) { emit("proxy:status", error.message); }
+  };
+  window.proxyBack = () => control(() => frame.contentWindow.history.back());
+  window.proxyForward = () => control(() => frame.contentWindow.history.forward());
+  window.proxyReload = () => control(() => frame.contentWindow.location.reload());
+  window.proxyToggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : frame.requestFullscreen();
+  initialize().catch(error => emit("proxy:error", error.message || "Unable to start the proxy."));
 })();

@@ -1,7 +1,3 @@
-importScripts("/controller/controller.sw.js");
-
-self.addEventListener("fetch", (event) => {
-  if ($scramjetController.shouldRoute(event)) {
-    event.respondWith($scramjetController.route(event));
-  }
-});
+importScripts("/chemical-worker.js");
+self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
