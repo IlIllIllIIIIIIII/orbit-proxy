@@ -5,6 +5,10 @@
   const transportSelect = document.getElementById('proxy-transport');
   const emit = (name, detail) => window.dispatchEvent(new CustomEvent(name, { detail }));
   const wisp = window.__PROXY_CONFIG__?.wispUrl || new URL('/wisp/', location.href).href.replace(/^http/, 'ws');
+  const debug = new URL(location.href).searchParams.get('debug') === '1';
+  // Only fixed labels and sanitized fields are logged, never errors or URLs
+  // supplied by a proxied app (which may contain credentials).
+  const trace = (stage, fields = {}) => { if (debug) console.info('[Orbit]', stage, fields); };
   let ready = false, controller, prismFrame, legacy, connection, registration;
   let activeEngine = 'prism', currentTransport, pending = false;
   const tabs = new Map();
@@ -45,6 +49,20 @@
 
   async function initialize() {
     if (location.protocol === 'file:' || !navigator.serviceWorker) throw new Error('Open Orbit on localhost or HTTPS, not as a file.');
+    const endpoint = new URL(wisp);
+    if (!['ws:', 'wss:'].includes(endpoint.protocol) || (location.protocol === 'https:' && endpoint.protocol !== 'wss:')) {
+      throw new Error('Wisp must use ws:// locally and wss:// on HTTPS.');
+    }
+    trace('wisp', { origin: endpoint.origin });
+    if (debug && typeof WebSocket === 'function') {
+      // Separate diagnostic handshake, not the runtime's application socket.
+      const probe = new WebSocket(wisp);
+      const timer = setTimeout(() => { trace('wisp-probe-timeout'); probe.close(); }, 10000);
+      probe.addEventListener('open', () => trace('wisp-probe-open'));
+      probe.addEventListener('message', () => { trace('wisp-probe-packet'); probe.close(); }, { once: true });
+      probe.addEventListener('error', () => trace('wisp-probe-error'));
+      probe.addEventListener('close', event => { clearTimeout(timer); trace('wisp-probe-close', { code: event.code }); });
+    }
     emit('proxy:status', 'Starting proxy engines…');
     const { ScramjetController } = window.$scramjetLoadController();
     legacy = new ScramjetController({
@@ -55,7 +73,7 @@
       codec: { ...window.orbitCodec }
     });
     await legacy.init();
-    registration = await navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' });
+    registration = await navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'classic', updateViaCache: 'none' });
     await timeout(navigator.serviceWorker.ready, 20000, 'Service worker startup timed out.');
     await new Promise((resolve, reject) => {
       const deadline = Date.now() + 20000;
@@ -67,6 +85,7 @@
       check();
     });
     connection = new BareMux.BareMuxConnection('/charon/worker.js');
+    trace('worker-ready', { state: registration.active?.state || 'active' });
     ready = true;
     emit('proxy:ready');
     emit('proxy:status', 'Ready');
@@ -80,26 +99,25 @@
           ? (window.EpoxyTransport.default || window.EpoxyTransport)
           : (window.LibcurlTransport.LibcurlClient || window.LibcurlTransport.default || window.LibcurlTransport);
         const transport = new Constructor({ wisp });
+        trace('transport-start', { engine, transport: choice, runtime: choice === 'epoxy' ? 'prism/libbyworse.js' : 'prism/libby.js' });
         await transport.init();
+        trace('transport-ready', { initialized: true });
         if (!controller) {
           Object.assign($scramjetController.config, {
             scramjetPath: '/prism/prism.js', injectPath: '/prism/prism.inject.js', wasmPath: '/prism/prism.wasm'
           });
           Object.assign($scramjetController.config.codec, window.orbitCodec);
-          controller = new $scramjetController.Controller({ serviceworker: registration.active, transport });
-          await controller.wait();
+          const candidate = new $scramjetController.Controller({ serviceworker: registration.active, transport });
+          await candidate.wait();
+          controller = candidate;
+          trace('controller-ready');
         } else await controller.setTransport(transport);
         currentTransport = choice;
       }
       if (!prismFrame) {
-          const owner = iframe;
-          prismFrame = controller.createFrame(iframe, { plugins: [
-            new $scramjetUtils.UrlWatcherPlugin(url => { if (iframe === owner) emit('proxy:url', url); }),
-            new $scramjetUtils.CatchEscapedLinksPlugin(url => {
-              if (iframe === owner) window.proxyNavigate(url.toString()).catch(error => emit('proxy:status', error.message));
-              return new URL(location.href);
-            })
-          ] });
+          // Match Galaxy's /api GeForce NOW launch: no navigation plugins.
+          prismFrame = controller.createFrame(iframe);
+          trace('frame-created', { engine });
       }
     } else {
       const base = selected === 'epoxy' ? '/libbybutslightlyworse/index.mjs' : '/libby/index.mjs';
@@ -107,19 +125,25 @@
     }
   }
 
-  window.proxyNavigate = async url => {
+  window.proxyNavigate = async (url, options = {}) => {
     if (!ready) throw new Error('The proxy is still starting.');
     if (pending) throw new Error('Please wait for the current navigation to start.');
     pending = true;
     try {
-      const engine = engineSelect.value;
+      const engine = options.engine || engineSelect.value;
+      const transport = options.transport || transportSelect.value;
+      if (!['prism', 'polygon', 'glass'].includes(engine) || !['libcurlRaw', 'libcurl', 'epoxy'].includes(transport)) throw new Error('Unsupported proxy selection.');
+      trace('navigation-start', { engine, transport });
       emit('proxy:status', 'Connecting…');
-      await setupTransport(engine, transportSelect.value);
+      await setupTransport(engine, transport);
       activeEngine = engine;
       if (engine === 'prism') prismFrame.go(url);
       else iframe.src = engine === 'glass' ? __uv$config.prefix + __uv$config.encodeUrl(url) : legacy.encodeUrl(url);
       emit('proxy:url', url);
       emit('proxy:status', 'Loading…');
+    } catch (error) {
+      trace('navigation-or-transport-failed', { engine: options.engine || engineSelect.value });
+      throw error;
     } finally { pending = false; }
   };
 
@@ -147,5 +171,5 @@
   window.proxyForward = () => control('forward');
   window.proxyReload = () => control('reload');
   window.proxyToggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : iframe.requestFullscreen();
-  initialize().catch(error => emit('proxy:error', error.message));
+  initialize().catch(error => { trace('initialization-failed'); emit('proxy:error', error.message); });
 })();

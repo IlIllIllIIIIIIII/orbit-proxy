@@ -13,7 +13,9 @@
   const shortcuts = document.querySelectorAll("[data-proxy-url]");
   shortcuts.forEach((button) => {
     controls.push(button);
-    button.addEventListener("click", () => navigate(button.dataset.proxyUrl));
+    button.addEventListener("click", () => navigate(button.dataset.proxyUrl,
+      new URL(button.dataset.proxyUrl).hostname === 'play.geforcenow.com'
+        ? { engine: 'prism', transport: 'libcurlRaw' } : {}));
   });
   let ready = false;
   const tabs = [{ id: 'initial', url: '' }];
@@ -91,10 +93,10 @@
     return `https://www.google.com/search?q=${encodeURIComponent(value)}`;
   }
 
-  async function navigate(value) {
+  async function navigate(value, options = {}) {
     try {
       const url = normalize(value);
-      await window.proxyNavigate(url);
+      await window.proxyNavigate(url, options);
       address.value = url;
       activeTab.url = url;
       renderTabs();

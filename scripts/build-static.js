@@ -18,6 +18,7 @@ for (const [directory, source] of [
   ["scram", scramjetPath],
   ["controller", path.dirname(require.resolve("@mercuryworkshop/scramjet-controller"))],
   ["utils", path.dirname(require.resolve("@mercuryworkshop/scramjet-utils"))],
+  // Compatibility mount only; current Prism loads /prism/libby.js instead.
   ["libcurl", path.dirname(require.resolve("@mercuryworkshop/libcurl-transport"))]
 ]) {
   await cp(source, path.join(output, directory), { recursive: true });

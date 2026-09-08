@@ -12,6 +12,9 @@ export const galaxyRuntime = [
   ['reflux', refluxPath]
 ];
 
+// Prism does NOT use galaxy-libcurl: its direct client is the pinned,
+// vendored public/prism/libby.js. This npm alias is only for BareMux engines.
+
 // Galaxy's pinned libcurl patch: initialize WASM before opening a session.
 export async function patchedLibcurl() {
   const source = await readFile(path.join(libcurlPath, 'index.mjs'), 'utf8');

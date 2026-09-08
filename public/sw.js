@@ -4,15 +4,16 @@ const { ScramjetServiceWorker } = $scramjetLoadWorker();
 const legacy = new ScramjetServiceWorker();
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
+async function handleRequest(event) {
+  await legacy.loadConfig();
+  if (uv.route(event)) return uv.fetch(event);
+  if (legacy.route(event)) return legacy.fetch(event);
+  return fetch(event.request);
+}
 self.addEventListener('fetch', event => {
-  if ($scramjetController.shouldRoute(event)) {
+  if (typeof $scramjetController !== 'undefined' && $scramjetController.shouldRoute(event)) {
     event.respondWith($scramjetController.route(event));
-  } else if (uv.route(event)) {
-    event.respondWith(uv.fetch(event));
-  } else if (new URL(event.request.url).pathname.startsWith('/scramjet/')) {
-    event.respondWith((async () => {
-      await legacy.loadConfig();
-      return legacy.route(event) ? legacy.fetch(event) : fetch(event.request);
-    })());
+    return;
   }
+  event.respondWith(handleRequest(event));
 });

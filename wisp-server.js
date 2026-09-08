@@ -2,7 +2,7 @@ import http from "node:http";
 import { server as wisp } from "@mercuryworkshop/wisp-js/server";
 
 const host = process.env.WISP_HOST || "0.0.0.0";
-const port = Number(process.env.WISP_PORT || 8081);
+const port = Number(process.env.WISP_PORT || process.env.PORT || 8081);
 const endpoint = "/wisp/";
 
 if (!Number.isInteger(port) || port < 1 || port > 65535) {
