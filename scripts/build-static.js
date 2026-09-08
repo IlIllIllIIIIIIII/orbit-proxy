@@ -21,7 +21,12 @@ for (const [directory, source] of [
   // Compatibility mount only; current Prism loads /prism/libby.js instead.
   ["libcurl", path.dirname(require.resolve("@mercuryworkshop/libcurl-transport"))]
 ]) {
-  await cp(source, path.join(output, directory), { recursive: true });
+  // Browser runtimes do not load TypeScript declarations. Avoid copying their
+  // large type trees (including cloud-sync duplicate files) into public builds.
+  await cp(source, path.join(output, directory), {
+    recursive: true,
+    filter: (file) => !file.endsWith('.ts')
+  });
 }
 await writeFile(path.join(output, "libby/index.mjs"), await patchedLibcurl());
 await writeFile(path.join(output, "config.js"),

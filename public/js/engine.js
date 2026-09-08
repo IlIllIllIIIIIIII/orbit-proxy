@@ -11,6 +11,7 @@
   const trace = (stage, fields = {}) => { if (debug) console.info('[Orbit]', stage, fields); };
   let ready = false, controller, prismFrame, legacy, connection, registration;
   let activeEngine = 'prism', currentTransport, pending = false;
+  let legacyTransportTask = null;
   const tabs = new Map();
   let activeTab = 'initial';
   window.proxySelectTab = id => {
@@ -34,6 +35,13 @@
   window.proxyCloseTab = id => {
     const tab = tabs.get(id);
     if (tab && id !== activeTab) {
+      // The pinned controller keeps every frame in a public array and has no
+      // removeFrame API. Release its reference when the corresponding tab closes.
+      const frames = tab.prismFrame?.controller?.frames;
+      if (Array.isArray(frames)) {
+        const index = frames.indexOf(tab.prismFrame);
+        if (index !== -1) frames.splice(index, 1);
+      }
       tab.iframe.remove();
       tabs.delete(id);
     }
@@ -72,8 +80,8 @@
       // mutable codec object with Prism, which requires callable functions.
       codec: { ...window.orbitCodec }
     });
-    await legacy.init();
-    registration = await navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'classic', updateViaCache: 'none' });
+    await timeout(legacy.init(), 30000, 'Proxy storage initialization timed out. Reopen Orbit and try again.');
+    registration = await timeout(navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'classic', updateViaCache: 'none' }), 30000, 'Service worker registration timed out.');
     await timeout(navigator.serviceWorker.ready, 20000, 'Service worker startup timed out.');
     await new Promise((resolve, reject) => {
       const deadline = Date.now() + 20000;
@@ -100,7 +108,9 @@
           : (window.LibcurlTransport.LibcurlClient || window.LibcurlTransport.default || window.LibcurlTransport);
         const transport = new Constructor({ wisp });
         trace('transport-start', { engine, transport: choice, runtime: choice === 'epoxy' ? 'prism/libbyworse.js' : 'prism/libby.js' });
-        await transport.init();
+        // Time out the individual wait, not setupTransport as a whole: a late
+        // transport completion must never resume frame creation/navigation.
+        await timeout(transport.init(), 30000, 'Transport startup timed out. Check the relay or try another transport.');
         trace('transport-ready', { initialized: true });
         if (!controller) {
           Object.assign($scramjetController.config, {
@@ -108,7 +118,7 @@
           });
           Object.assign($scramjetController.config.codec, window.orbitCodec);
           const candidate = new $scramjetController.Controller({ serviceworker: registration.active, transport });
-          await candidate.wait();
+          await timeout(candidate.wait(), 30000, 'Proxy controller startup timed out. Check the service worker and runtime assets.');
           controller = candidate;
           trace('controller-ready');
         } else await controller.setTransport(transport);
@@ -121,7 +131,13 @@
       }
     } else {
       const base = selected === 'epoxy' ? '/libbybutslightlyworse/index.mjs' : '/libby/index.mjs';
-      await connection.setTransport(selected === 'libcurlRaw' ? base : '/reflux/index.mjs', [{ base, wisp }]);
+      // BareMux changes shared state asynchronously. Do not race a retry against
+      // an earlier switch that is still completing after its caller timed out.
+      if (legacyTransportTask) await timeout(legacyTransportTask, 30000, 'The previous transport switch is still pending.');
+      const task = Promise.resolve(connection.setTransport(selected === 'libcurlRaw' ? base : '/reflux/index.mjs', [{ base, wisp }]));
+      legacyTransportTask = task;
+      task.then(() => { if (legacyTransportTask === task) legacyTransportTask = null; }, () => { if (legacyTransportTask === task) legacyTransportTask = null; });
+      await timeout(task, 30000, 'Transport startup timed out. Check the relay or try another engine.');
     }
   }
 
@@ -153,6 +169,13 @@
     if (!ready) return;
     try {
       const href = iframe.contentWindow.location.href;
+      if (activeEngine === 'prism' && prismFrame) {
+        const prefix = new URL(prismFrame.prefix, location.href).href;
+        if (href.startsWith(prefix)) {
+          const decoded = window.$scramjet.unrewriteUrl(href, prismFrame.context);
+          if (/^https?:\/\//.test(decoded)) emit('proxy:url', decoded);
+        }
+      }
       if (activeEngine === 'glass' && href.includes(__uv$config.prefix)) emit('proxy:url', __uv$config.decodeUrl(href.split(__uv$config.prefix)[1]));
       if (activeEngine === 'polygon' && href.includes('/scramjet/')) emit('proxy:url', window.orbitCodec.decode(href.split('/scramjet/')[1]));
     } catch (_) { /* Cross-origin documents do not expose their URL. */ }
