@@ -27,6 +27,23 @@ keeps private and loopback destination addresses blocked. In production, use a
 
 ## Deployment notes
 
+### Render static site
+
+The static build uses `wss://orbit-proxy-6iw7.onrender.com/wisp/` by default.
+Keep that separate Wisp Web Service running.
+
+- Build command: `npm ci && npm run build`
+- Publish directory: `dist-render`
+- Optional build environment override: `WISP_URL` (must start with `wss://`).
+
+For an existing Render Static Site, add these headers for path `/*` under its
+Headers settings: `Cross-Origin-Opener-Policy: same-origin`,
+`Cross-Origin-Embedder-Policy: require-corp`, and `Cache-Control: no-cache`.
+The included `render.yaml` supplies these settings when creating a Blueprint.
+Do not add a catch-all rewrite to `index.html`: proxy routes are handled by
+the service worker. Upload the source including `scripts/build-static.js`;
+Render generates `dist-render` during its build.
+
 - Use HTTPS outside localhost: browsers only permit service workers in secure contexts.
 - Keep WebSocket upgrades enabled and routed to `/wisp/`; serverless hosts are usually a poor fit for long-lived Wisp connections.
 - Do not cache `sw.js` or the Scramjet runtime directories across releases.

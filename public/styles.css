@@ -10,6 +10,8 @@
 body { margin: 0; min-width: 320px; min-height: 100vh; background: #080b16; }
 
 .shell { min-height: 100vh; display: flex; flex-direction: column; }
+.blank-launcher { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; padding: 12px 18px; background: #111a31; color: #c1cbe4; font-size: 0.875rem; }
+.blank-launcher button { padding: 10px 16px; }
 
 .toolbar {
   min-height: 64px;
@@ -47,6 +49,11 @@ h1 { max-width: 730px; margin: 0; font-size: clamp(2.35rem, 7vw, 5.2rem); line-h
 .welcome-form input { border: 0; background: transparent; }
 .welcome-form button { flex: none; padding: 11px 18px; }
 .hint { margin-top: 18px; color: #8391b5; font-size: 0.78rem; }
+.shortcuts { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.shortcuts button { min-height: 44px; padding: 10px 20px; border: 1px solid #344266; background: #1d2745; color: #f4f6ff; }
+.shortcuts button:hover:not(:disabled) { background: #2b3b60; border-color: #70e4d2; }
+.shortcuts button:focus-visible { outline: 2px solid #70e4d2; outline-offset: 3px; }
+[hidden] { display: none !important; }
 
 .proxy-view { flex: 1; background: #fff; }
 #proxy-frame { display: block; width: 100%; height: calc(100vh - 65px); border: 0; background: #fff; }

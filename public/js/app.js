@@ -10,6 +10,11 @@
   const status = document.getElementById("status");
   const controls = ["back", "forward", "reload", "fullscreen"].map((id) => document.getElementById(id));
   const fullscreenButton = document.getElementById("fullscreen");
+  const shortcuts = document.querySelectorAll("[data-proxy-url]");
+  shortcuts.forEach((button) => {
+    controls.push(button);
+    button.addEventListener("click", () => navigate(button.dataset.proxyUrl));
+  });
   let ready = false;
 
   function normalize(input) {

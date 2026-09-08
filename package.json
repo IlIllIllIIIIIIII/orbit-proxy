@@ -5,6 +5,7 @@
   "type": "module",
   "description": "A small self-hosted Scramjet V2 web proxy.",
   "scripts": {
+    "build": "node scripts/build-static.js",
     "start": "node server.js",
     "dev": "node --watch server.js",
     "wisp": "node wisp-server.js",
@@ -21,5 +22,17 @@
     "@mercuryworkshop/scramjet-utils": "0.0.3",
     "@mercuryworkshop/wisp-js": "^0.4.1",
     "express": "^5.1.0"
-  }
+  },
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IlIllIllIIIIIIII/orbit-proxy.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IlIllIllIIIIIIII/orbit-proxy/issues"
+  },
+  "homepage": "https://github.com/IlIllIllIIIIIIII/orbit-proxy#readme"
 }
