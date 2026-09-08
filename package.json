@@ -5,7 +5,8 @@
   "type": "module",
   "description": "A small self-hosted Scramjet V2 web proxy.",
   "scripts": {
-    "build": "node scripts/build-static.js",
+    "build": "node scripts/build-static.js && node scripts/verify-static.js",
+    "test": "node --test tests/*.test.js",
     "start": "node server.js",
     "dev": "node --watch server.js",
     "wisp": "node wisp-server.js",

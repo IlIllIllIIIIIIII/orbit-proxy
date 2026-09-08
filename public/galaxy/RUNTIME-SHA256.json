@@ -1,0 +1,21 @@
+{
+  "revision": "a7b99031a0ffba0245cad2350ac5cab77fdc6cbd",
+  "files": {
+    "prism/libby.js": "381e48d648f077a2ff6b58bea6fbb6fdbdaa3c4841dfcb7dd45746ea88a2c957",
+    "prism/libbyworse.js": "efcf1e892d3a9f5f49b9358e9a84e94f477af0befc01260e2e133a357472a3a7",
+    "prism/prism.api.js": "2286761b8b0e01877f9120bb6bff66b4636e26cadaa0d470a702c9bb1b24457a",
+    "prism/prism.inject.js": "cc7b4920919e65f3615ebd03e8a1bbb5e76463a9af8b3be63ad90de61f508a60",
+    "prism/prism.js": "f46f601bf7fe6f15aedadacb78f57c82f39dd657dcd8f7bdf980eae0050c2938",
+    "prism/prism.sw.js": "94a08cd27a00193864aa4fb06a07a72284cac8d530bba620620311be627e0f81",
+    "prism/prism.wasm": "3d0eb5a719ae1d41d22786eee4cbd317afe0a65f77ede350face4c19c602aa06",
+    "poly/polygon.all.js": "ccb3a7c2e8037a3fc6050cba4dfc563414132b85b925b61f49690e3a8127ad4c",
+    "poly/polygon.bundle.js": "0819624791c6008ecffcac5dd4f4a825bf677727fd2094ced4b90f63a93378d5",
+    "poly/polygon.sync.js": "d6d71c567a32bd72e1bc6234c073c3a1737d8a988a3bc9badeb97ae2051e248a",
+    "poly/polygon.wasm.wasm": "36c24c81cd97cbfecaf13635627145753165699979488922a330972e8a50d706",
+    "glass/glass.bundle.js": "4a777c52685b8618f77b543e62bdcd87d87147e581af4b7eea3bfc0e37398539",
+    "glass/glass.client.js": "14aa6b5a82744709bf341d7774f6801495c918cb2a691865ddcde43e0a1b1a29",
+    "glass/glass.config.js": "c6dceb74f61e744b990e7e15b8b5cce8c1296a969af13ed753a88d17e7c2a842",
+    "glass/glass.handler.js": "88935340471199e003d299c7d19b8bd095cd4c98945a81d2cd3171f6f732e6ba",
+    "glass/glass.sw.js": "d76f3bfbdd49190daa0c8d4829f7e2e7eaaf3648745305dda02f97441995c066"
+  }
+}

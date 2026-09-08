@@ -13,6 +13,10 @@
   let activeEngine = 'prism', currentTransport, pending = false;
   let legacyTransportTask = null;
   const tabs = new Map();
+  const debugPrefixes = new Set();
+  const syncDebug = () => {
+    if (debug) registration?.active?.postMessage({ type: 'orbit:debug', prefixes: [...debugPrefixes] });
+  };
   let activeTab = 'initial';
   window.proxySelectTab = id => {
     if (pending) throw new Error('Please wait for the current navigation.');
@@ -42,6 +46,8 @@
         const index = frames.indexOf(tab.prismFrame);
         if (index !== -1) frames.splice(index, 1);
       }
+      debugPrefixes.delete(tab.prismFrame?.prefix);
+      syncDebug();
       tab.iframe.remove();
       tabs.delete(id);
     }
@@ -62,6 +68,7 @@
       throw new Error('Wisp must use ws:// locally and wss:// on HTTPS.');
     }
     trace('wisp', { origin: endpoint.origin });
+    trace('environment', { isolated: window.crossOriginIsolated === true });
     if (debug && typeof WebSocket === 'function') {
       // Separate diagnostic handshake, not the runtime's application socket.
       const probe = new WebSocket(wisp);
@@ -93,6 +100,24 @@
       check();
     });
     connection = new BareMux.BareMuxConnection('/charon/worker.js');
+    if (debug) {
+      navigator.serviceWorker.addEventListener('message', event => {
+        if (event.source !== registration.active) return;
+        if (event.data?.$controller$swrevive) {
+          syncDebug();
+          trace('worker-revived');
+          return;
+        }
+        if (event.data?.type !== 'orbit:route') return;
+        const data = event.data;
+        // Log only bounded metadata; never spread data from message events.
+        if (!['prism', 'glass', 'polygon', 'network'].includes(data.engine)) return;
+        const destination = ['document', 'iframe', 'worker', 'sharedworker', 'serviceworker', 'script', 'style', 'image', 'font', 'audio', 'video', '', 'other'].includes(data.destination) ? data.destination : 'other';
+        trace('service-worker-route', { engine: data.engine, destination, status: Number.isInteger(data.status) ? data.status : 0, failed: data.failed === true });
+        if (data.failed === true && ['worker', 'sharedworker', 'serviceworker'].includes(destination)) trace('worker-request-failed', { engine: data.engine, destination });
+      });
+      syncDebug();
+    }
     trace('worker-ready', { state: registration.active?.state || 'active' });
     ready = true;
     emit('proxy:ready');
@@ -117,6 +142,7 @@
             scramjetPath: '/prism/prism.js', injectPath: '/prism/prism.inject.js', wasmPath: '/prism/prism.wasm'
           });
           Object.assign($scramjetController.config.codec, window.orbitCodec);
+          trace('controller-create');
           const candidate = new $scramjetController.Controller({ serviceworker: registration.active, transport });
           await timeout(candidate.wait(), 30000, 'Proxy controller startup timed out. Check the service worker and runtime assets.');
           controller = candidate;
@@ -127,10 +153,13 @@
       if (!prismFrame) {
           // Match Galaxy's /api GeForce NOW launch: no navigation plugins.
           prismFrame = controller.createFrame(iframe);
+          debugPrefixes.add(prismFrame.prefix);
+          syncDebug();
           trace('frame-created', { engine });
       }
     } else {
       const base = selected === 'epoxy' ? '/libbybutslightlyworse/index.mjs' : '/libby/index.mjs';
+      trace('transport-start', { engine, transport: selected, runtime: base });
       // BareMux changes shared state asynchronously. Do not race a retry against
       // an earlier switch that is still completing after its caller timed out.
       if (legacyTransportTask) await timeout(legacyTransportTask, 30000, 'The previous transport switch is still pending.');
@@ -138,6 +167,7 @@
       legacyTransportTask = task;
       task.then(() => { if (legacyTransportTask === task) legacyTransportTask = null; }, () => { if (legacyTransportTask === task) legacyTransportTask = null; });
       await timeout(task, 30000, 'Transport startup timed out. Check the relay or try another engine.');
+      trace('transport-ready', { initialized: true, engine });
     }
   }
 
