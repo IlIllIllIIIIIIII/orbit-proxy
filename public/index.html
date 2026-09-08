@@ -47,7 +47,7 @@
 
       <section id="welcome" class="welcome" aria-labelledby="welcome-title">
         <div class="orb" aria-hidden="true"></div>
-        <p class="eyebrow">ORBIT PROXY</p>
+        <p class="eyebrow">ORBIT • GALAXY V7 ENGINES</p>
         <h1 id="welcome-title">Browse through your own relay.</h1>
         <p class="welcome-copy">
           Enter a full web address or a search term. This proxy runs locally and
@@ -65,6 +65,18 @@
           />
           <button type="submit">Open site</button>
         </form>
+        <div class="proxy-options">
+          <label>Engine <select id="proxy-engine">
+            <option value="prism">Scramjet V2 (Prism)</option>
+            <option value="polygon">Scramjet (Polygon)</option>
+            <option value="glass">Ultraviolet (Glass)</option>
+          </select></label>
+          <label>Transport <select id="proxy-transport">
+            <option value="libcurlRaw">libcurl</option>
+            <option value="epoxy">Epoxy</option>
+            <option value="libcurl">libcurl + Reflux (legacy engines)</option>
+          </select></label>
+        </div>
         <nav class="shortcuts" aria-label="Website shortcuts">
           <button type="button" data-proxy-url="https://youtube.com" disabled>YouTube</button>
           <button type="button" data-proxy-url="https://play.geforcenow.com/mall/" disabled>GeForce NOW</button>
@@ -77,7 +89,17 @@
       </section>
     </main>
 
+    <script src="/charon/index.js"></script>
+    <script src="/glass/glass.bundle.js"></script>
+    <script src="/glass/glass.config.js"></script>
+    <script src="/poly/polygon.all.js"></script>
+    <script src="/prism/prism.js"></script>
+    <script src="/prism/prism.api.js"></script>
+    <script src="/utils/scramjet-utils.js"></script>
+    <script src="/prism/libby.js"></script>
+    <script src="/prism/libbyworse.js"></script>
     <script src="/config.js"></script>
+    <script src="/js/codec.js"></script>
     <script src="/js/engine.js"></script>
     <script src="/js/app.js"></script>
   </body>

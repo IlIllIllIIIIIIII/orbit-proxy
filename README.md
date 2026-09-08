@@ -1,10 +1,10 @@
-# Orbit — ChemicalJS proxy
+# Orbit — Galaxy v7 proxy engines
 
-A compact self-hosted web proxy using ChemicalJS 2.6.4 with its Ultraviolet engine, compatible libcurl transport, and a Wisp endpoint. Website addresses are encoded by ChemicalJS and opened inside the existing iframe, with shortcuts and fullscreen controls preserved.
+Orbit now integrates Galaxy v7's Prism (Scramjet V2), Polygon (legacy Scramjet), and Glass (Ultraviolet) runtimes. Choose an engine and libcurl or Epoxy before opening a website; click Orbit to return to these choices without reloading the shell. Prism is the default used by Galaxy's GeForce NOW shortcut. Reflux is available for legacy-engine transports, as in Galaxy; Prism uses its direct transport API.
 
-ChemicalJS browser assets are vendored because its published package references unavailable server dependencies. Include the entire `vendor/chemicaljs` folder when uploading to GitHub. See `vendor/chemicaljs/PROVENANCE.md` and its upstream AGPL license. The build also distributes these sources at `/chemical-source/`.
+Upload all of `public/prism`, `public/poly`, `public/glass`, `scripts`, `package.json`, and `package-lock.json` to GitHub. The runtime assets are included rather than downloaded during deployment. Build and publish settings below are unchanged. The Wisp relay must stay running. Engine changes do not guarantee network-filter bypass or playable GeForce NOW streams.
 
-After deploying this engine change, close and reopen the site to initialize the new runtime. This does not guarantee that a network filter will allow GeForce NOW or that game streaming will work.
+Based on Galaxy revision `a7b99031a0ffba0245cad2350ac5cab77fdc6cbd`. See `public/galaxy/PROVENANCE.md` for source attribution and licensing caveats. This is the proxy integration, not Galaxy's desktop or game catalog.
 
 ## Run it
 

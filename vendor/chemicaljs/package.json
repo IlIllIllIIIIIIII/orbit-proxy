@@ -1,8 +1,0 @@
-{
-  "name": "chemicaljs",
-  "version": "2.6.4",
-  "private": true,
-  "type": "module",
-  "license": "AGPL-3.0-only",
-  "description": "Browser assets from the official chemicaljs 2.6.4 npm package; server-only dependencies omitted."
-}

@@ -16,6 +16,11 @@
     button.addEventListener("click", () => navigate(button.dataset.proxyUrl));
   });
   let ready = false;
+  document.querySelector('.brand').addEventListener('click', event => {
+    event.preventDefault();
+    welcome.hidden = false;
+    proxyView.hidden = true;
+  });
 
   function normalize(input) {
     const value = input.trim();

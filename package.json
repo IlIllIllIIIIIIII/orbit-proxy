@@ -16,15 +16,16 @@
     "node": ">=20"
   },
   "dependencies": {
-    "chemicaljs": "file:vendor/chemicaljs",
     "@mercuryworkshop/bare-mux": "2.1.9",
-    "chemical-libcurl": "npm:@mercuryworkshop/libcurl-transport@1.5.2",
+    "@mercuryworkshop/epoxy-transport": "2.1.28",
     "@mercuryworkshop/libcurl-transport": "^2.0.5",
     "@mercuryworkshop/scramjet": "2.0.67-alpha.2",
     "@mercuryworkshop/scramjet-controller": "0.0.14",
     "@mercuryworkshop/scramjet-utils": "0.0.3",
     "@mercuryworkshop/wisp-js": "^0.4.1",
-    "express": "^5.1.0"
+    "@nightnetwork/reflux": "2.2.0",
+    "express": "^5.1.0",
+    "galaxy-libcurl": "npm:@mercuryworkshop/libcurl-transport@1.5.2"
   },
   "main": "server.js",
   "repository": {

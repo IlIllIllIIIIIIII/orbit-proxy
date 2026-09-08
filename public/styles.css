@@ -50,6 +50,10 @@ h1 { max-width: 730px; margin: 0; font-size: clamp(2.35rem, 7vw, 5.2rem); line-h
 .welcome-form button { flex: none; padding: 11px 18px; }
 .hint { margin-top: 18px; color: #8391b5; font-size: 0.78rem; }
 .shortcuts { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.proxy-options { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px; margin-top: 20px; }
+.proxy-options label { display: grid; gap: 6px; text-align: left; font-size: 0.9rem; color: #c1cbe4; }
+.proxy-options select { max-width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #344266; background: #111a31; color: #f8fbff; font: inherit; }
+.proxy-options select:focus-visible { outline: 2px solid #70e4d2; outline-offset: 2px; }
 .shortcuts button { min-height: 44px; padding: 10px 20px; border: 1px solid #344266; background: #1d2745; color: #f4f6ff; }
 .shortcuts button:hover:not(:disabled) { background: #2b3b60; border-color: #70e4d2; }
 .shortcuts button:focus-visible { outline: 2px solid #70e4d2; outline-offset: 3px; }

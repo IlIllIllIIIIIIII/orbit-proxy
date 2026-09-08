@@ -1,6 +1,6 @@
 node_modules/
+.chemical-runtime/
 dist-render/
 dist/
-.chemical-runtime/
 .env
 npm-debug.log*
