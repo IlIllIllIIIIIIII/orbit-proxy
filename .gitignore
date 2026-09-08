@@ -1,4 +1,5 @@
 node_modules/
 dist-render/
+dist/
 .env
 npm-debug.log*

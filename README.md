@@ -33,7 +33,7 @@ The static build uses `wss://orbit-proxy-6iw7.onrender.com/wisp/` by default.
 Keep that separate Wisp Web Service running.
 
 - Build command: `npm ci && npm run build`
-- Publish directory: `dist-render`
+- Publish directory: `dist-render` or `dist` (the build generates both)
 - Optional build environment override: `WISP_URL` (must start with `wss://`).
 
 For an existing Render Static Site, add these headers for path `/*` under its
@@ -43,6 +43,13 @@ The included `render.yaml` supplies these settings when creating a Blueprint.
 Do not add a catch-all rewrite to `index.html`: proxy routes are handled by
 the service worker. Upload the source including `scripts/build-static.js`;
 Render generates `dist-render` during its build.
+
+To replace the existing math site at formative.icu, connect this repository to
+that existing Render Static Site and keep its custom domain attached. Use the
+build command above; either `dist` or `dist-render` works as its publish directory.
+Set the listed headers on that existing service: merely connecting a repository
+does not apply its `render.yaml` Blueprint settings. Remove any inherited SPA
+catch-all rewrite. This replaces the math site's published content with Orbit.
 
 - Use HTTPS outside localhost: browsers only permit service workers in secure contexts.
 - Keep WebSocket upgrades enabled and routed to `/wisp/`; serverless hosts are usually a poor fit for long-lived Wisp connections.

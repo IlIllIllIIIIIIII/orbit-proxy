@@ -22,4 +22,6 @@ for (const [directory, source] of [
 }
 await writeFile(path.join(output, "config.js"),
   `globalThis.__PROXY_CONFIG__ = ${JSON.stringify({ wispUrl: wisp.href })};\n`);
-console.log(`Static proxy built in dist-render using ${wisp.href}`);
+// Support an existing static service configured with Vite's default directory.
+await cp(output, path.join(root, "dist"), { recursive: true });
+console.log(`Static proxy built in dist-render and dist using ${wisp.href}`);
