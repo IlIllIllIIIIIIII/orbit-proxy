@@ -24,6 +24,11 @@ test('Galaxy integration selects all three engines and both transport APIs', asy
     CustomEvent: class { constructor(type, options) { this.type = type; this.detail = options.detail; } },
     dispatchEvent(event) { if (event.type === 'proxy:ready') finish(); if (event.type === 'proxy:error') throw Error(event.detail); },
     $scramjetLoadController: () => ({ ScramjetController: class {
+      constructor(options) {
+        // Match the real legacy engine's in-place serialization.
+        options.codec.encode = options.codec.encode.toString();
+        options.codec.decode = options.codec.decode.toString();
+      }
       async init() {}
       encodeUrl(url) { return '/scramjet/' + encodeURIComponent(url); }
     } }),
@@ -31,7 +36,11 @@ test('Galaxy integration selects all three engines and both transport APIs', asy
     LibcurlTransport: { LibcurlClient: Transport }, EpoxyTransport: { default: Transport },
     $scramjetController: { config: { codec: {} }, Controller: class {
       async wait() {}
-      createFrame() { return frame; }
+      createFrame() {
+        assert.equal(typeof context.$scramjetController.config.codec.encode, 'function');
+        assert.equal(typeof context.$scramjetController.config.codec.decode, 'function');
+        return frame;
+      }
       async setTransport() { calls.push(['switch']); }
     } },
     $scramjetUtils: { UrlWatcherPlugin: class {}, CatchEscapedLinksPlugin: class {} },
@@ -41,6 +50,8 @@ test('Galaxy integration selects all three engines and both transport APIs', asy
   vm.runInContext(await readFile('public/js/codec.js', 'utf8'), context);
   vm.runInContext(await readFile('public/js/engine.js', 'utf8'), context);
   await ready;
+  assert.equal(typeof context.orbitCodec.encode, 'function');
+  assert.equal(typeof context.orbitCodec.decode, 'function');
   const url = 'https://example.com/';
   await context.proxyNavigate(url);
   assert.deepEqual(calls.find(call => call[0] === 'go'), ['go', url]);

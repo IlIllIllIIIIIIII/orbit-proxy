@@ -23,7 +23,9 @@
     legacy = new ScramjetController({
       prefix: '/scramjet/',
       files: { wasm: '/poly/polygon.wasm.wasm', all: '/poly/polygon.all.js', sync: '/poly/polygon.sync.js' },
-      codec: window.orbitCodec
+      // Legacy Scramjet serializes these functions in place. Do not share its
+      // mutable codec object with Prism, which requires callable functions.
+      codec: { ...window.orbitCodec }
     });
     await legacy.init();
     registration = await navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' });
