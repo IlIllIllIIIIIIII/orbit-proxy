@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#0b1020" />
     <title>Orbit Proxy</title>
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/zen.css" />
     <script src="/js/blank-window.js" defer></script>
     <script
       async
@@ -20,11 +21,11 @@
     </aside>
     <main class="shell">
       <aside class="sidebar" id="sidebar" aria-label="Browser tabs">
-        <div class="sidebar-heading"><span class="brand-mark">◉</span><strong>Orbit</strong><span class="sidebar-caption">Personal</span></div>
+        <div class="sidebar-heading" aria-hidden="true"><i></i><i></i><i></i></div>
         <button id="new-tab" class="new-tab" type="button">＋ New tab</button>
-        <p class="sidebar-label">OPEN TABS</p>
+        <p class="sidebar-label">☀ <span>Personal</span></p>
         <nav id="tab-list" aria-label="Open tabs"></nav>
-        <div class="sidebar-footer"><span class="workspace-dot"></span> Your workspace <span>◌</span></div>
+        <div class="sidebar-footer"><button id="settings-open" type="button" title="Proxy settings" aria-label="Proxy settings">⚙</button><span title="Personal workspace">☀</span><button id="focus-address" type="button" title="Search" aria-label="Focus address bar">⌕</button></div>
       </aside>
       <header class="toolbar">
         <button id="sidebar-toggle" class="icon-button" type="button" aria-label="Toggle sidebar" aria-controls="sidebar" aria-expanded="true">☰</button>
@@ -45,7 +46,7 @@
             autocomplete="off"
             autocapitalize="off"
             spellcheck="false"
-            placeholder="Search or enter a website"
+            placeholder="Search with Google or enter address"
             inputmode="url"
           />
           <button type="submit">Go</button>
@@ -94,6 +95,10 @@
         <iframe id="proxy-frame" title="Proxied website" referrerpolicy="no-referrer" allowfullscreen></iframe>
       </section>
     </main>
+    <dialog id="proxy-settings" aria-labelledby="settings-title">
+      <form method="dialog" class="settings-heading"><h2 id="settings-title">Proxy settings</h2><button aria-label="Close settings">×</button></form>
+      <p>Choose the engine and transport for your next navigation.</p>
+    </dialog>
 
     <script src="/charon/index.js"></script>
     <script src="/glass/glass.bundle.js"></script>
@@ -106,6 +111,7 @@
     <script src="/prism/libbyworse.js"></script>
     <script src="/config.js"></script>
     <script src="/js/codec.js"></script>
+    <script src="/js/zen.js"></script>
     <script src="/js/engine.js"></script>
     <script src="/js/app.js"></script>
   </body>

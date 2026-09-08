@@ -64,7 +64,7 @@
     if (!selectTab(tab)) return false;
     tabs.push(tab);
     renderTabs();
-    welcomeAddress.focus();
+    address.focus();
     return true;
   }
   document.getElementById('new-tab').onclick = newTab;

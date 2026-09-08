@@ -1,0 +1,65 @@
+/* Screenshot-matched, translucent sidebar chrome. No simulated browser page. */
+:root { color-scheme: dark; font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #e0e8e8; background: #33454c; }
+body { background: #33454c; }
+.shell { grid-template-columns: 224px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 8px; padding: 8px; min-height: 460px; background: radial-gradient(ellipse at 10% 0%, #416671 0%, transparent 60%), linear-gradient(155deg, #354c54 5%, #343b38 72%, #3c382a); border: 1px solid #93a5a64a; border-radius: 12px; box-shadow: inset 0 0 0 1px #17242c70; }
+.sidebar { grid-column: 1; grid-row: 1; padding: 2px 0 0; gap: 6px; }
+.toolbar { display: flex; flex-wrap: nowrap; padding: 0; gap: 3px; min-height: 32px; }
+.sidebar-heading { display: flex; flex-shrink: 0; gap: 6px; padding: 0 3px; }
+.sidebar-heading i { width: 10px; height: 10px; border-radius: 50%; background: #a5c1c22b; }
+.controls { gap: 0; margin-left: auto; }
+.icon-button { width: 28px; height: 30px; color: #c2d4d8; background: transparent; font-weight: 400; }
+.toolbar .brand { display: none; }
+.address-form { flex: none; display: flex; min-height: 40px; gap: 0; background: #c7e0df1c; border: 1px solid transparent; border-radius: 13px; }
+.address-form:focus-within { background: #c7e0df2b; border-color: #bfd4d975; }
+.address-form input { padding: 9px 10px; font-size: .875rem; color: #f0f6f6; text-overflow: ellipsis; }
+.address-form input::placeholder { color: #c4d4d8; opacity: .9; }
+.address-form input:focus { box-shadow: none; }
+.address-form button { padding: 0 9px; font-size: .875rem; color: #d0dcde; }
+.shortcuts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin: 2px 0 0; }
+.shortcuts button { min-height: 48px; padding: 8px; border: 0; border-radius: 13px; background: #c9e2df1c; font-size: 1.35rem; font-weight: 500; }
+.shortcuts .discord { color: #95a0ff; }
+.shortcuts .geforce { color: #90dcc0; }
+.shortcuts .chatgpt { color: #e0e4e2; }
+.shortcuts .reddit { color: #ef9475; }
+.shortcuts .github { color: #cbd7da; }
+.shortcuts .youtube { color: #f27687; }
+button:hover:not(:disabled), .icon-button:hover:not(:disabled), .shortcuts button:hover:not(:disabled) { background: #d4e8e626; color: #f5fbfb; border-color: transparent; }
+.sidebar-label { display: flex; gap: 10px; align-items: center; margin: 13px 9px 8px; padding: 0; font-size: .875rem; letter-spacing: 0; color: #ffc96d; }
+.sidebar-label span { color: #c2d3d7; font-weight: 600; }
+#tab-list { flex: 0 1 auto; min-height: 0; }
+.tab-row { margin: 2px 0; border-radius: 9px; padding: 1px; }
+.tab-row.active { background: #d8e6e30e; box-shadow: none; }
+.tab-open { padding: 11px 9px; color: #d7e1e2; font-weight: 400; }
+.tab-close { opacity: 0; color: #d7e1e2; }
+.tab-row:hover .tab-close, .tab-row:focus-within .tab-close { opacity: 1; }
+.new-tab { background: transparent; color: #c4d0d1; padding: 10px; font-weight: 400; margin-bottom: auto; }
+.status { flex: none; width: auto; min-height: 20px; font-size: .875rem; text-align: left; padding: 0 10px; color: #bbcdd0; }
+.sidebar-footer { padding: 0 2px; gap: 16px; min-height: 34px; }
+.sidebar-footer button { width: 30px; height: 30px; padding: 0; background: transparent; color: #ccd7d6; font-size: 1.2rem; font-weight: 400; }
+.sidebar-footer > span { font-size: .875rem; color: #f6c768; }
+.sidebar-footer > :last-child { margin-left: auto; }
+.welcome, .proxy-view { grid-column: 2; grid-row: 1; border-radius: 7px; box-shadow: inset 0 0 0 1px #c3d6d218; }
+.welcome { padding: 0; background: radial-gradient(ellipse at 74% 35%, #a8aba331, transparent 64%), radial-gradient(ellipse at 23% 63%, #344e6970, transparent 65%), linear-gradient(150deg, #62777a, #626c68 48%, #5a5244); }
+.welcome > * { display: none; }
+.proxy-view { background: #657475; }
+.shell.sidebar-collapsed { grid-template-columns: 0 minmax(0, 1fr); gap: 0; }
+.sidebar-collapsed #sidebar-toggle { position: fixed; display: block; top: 12px; left: 12px; z-index: 20; background: #344c55; border-radius: 8px; }
+.sidebar-collapsed .sidebar { display: contents; }
+.sidebar-collapsed .sidebar > :not(.toolbar), .sidebar-collapsed .toolbar > :not(#sidebar-toggle) { display: none; }
+.sidebar-collapsed .toolbar { position: absolute; }
+#proxy-settings { width: min(440px, calc(100vw - 32px)); padding: 24px; background: #33494ff2; border: 1px solid #a4c0c04a; border-radius: 16px; color: #ecf2f2; box-shadow: 0 20px 80px #0007; backdrop-filter: blur(24px); }
+#proxy-settings::backdrop { background: #12232d66; backdrop-filter: blur(6px); }
+.settings-heading { display: flex; align-items: center; justify-content: space-between; }
+.settings-heading h2 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+.settings-heading button { background: transparent; color: inherit; font-size: 1.4rem; padding: 4px 10px; }
+#proxy-settings p { color: #ccd9da; line-height: 1.5; }
+.proxy-options { flex-direction: column; gap: 16px; }
+.proxy-options select { background: #20383e; border-color: #a2bebe40; }
+@media (max-width: 600px) {
+  .shell { grid-template-columns: 180px minmax(0, 1fr); }
+  .sidebar-heading { display: none; }
+  .status { display: block; }
+  .tab-close { opacity: 1; }
+  .address-form { flex-basis: auto; }
+  .shortcuts button { min-height: 42px; }
+}
